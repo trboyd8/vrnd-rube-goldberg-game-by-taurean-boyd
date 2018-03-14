@@ -12,6 +12,7 @@ public class ControllerInputManager : MonoBehaviour
     private Vector3 teleportLocation;
     private int laserLength;
     private int groundRayLength;
+    private float throwForce;
 
     public GameObject TeleportObject;
     public GameObject Player;
@@ -25,6 +26,7 @@ public class ControllerInputManager : MonoBehaviour
         laser = this.GetComponentInChildren<LineRenderer> ();
         laserLength = 8;
         groundRayLength = 17;
+        throwForce = 1.5f;
 	}
 	
 	// Update is called once per frame
@@ -68,4 +70,25 @@ public class ControllerInputManager : MonoBehaviour
             }
         }
 	}
+
+    void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.CompareTag ("Throwable"))
+        {
+            if (device.GetPressDown (SteamVR_Controller.ButtonMask.Trigger))
+            {
+                other.transform.SetParent (gameObject.transform);
+                other.GetComponent<Rigidbody> ().isKinematic = true;
+                device.TriggerHapticPulse (2000);
+            }
+            else if (device.GetPressUp (SteamVR_Controller.ButtonMask.Trigger))
+            {
+                other.transform.SetParent (null);
+                Rigidbody otherRigidBody = other.GetComponent<Rigidbody> ();
+                otherRigidBody.isKinematic = false;
+                otherRigidBody.velocity = device.velocity * throwForce;
+                otherRigidBody.angularVelocity = device.angularVelocity;
+            }
+        }
+    }
 }

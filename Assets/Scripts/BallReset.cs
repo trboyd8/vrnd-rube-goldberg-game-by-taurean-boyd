@@ -23,8 +23,10 @@ public class BallReset : MonoBehaviour
     {
         if (col.gameObject.CompareTag ("Ground"))
         {
-            Debug.Log("The ball is being reset.");
             this.gameObject.transform.position = originalPosition;
+            Rigidbody ballRigidBody = this.GetComponent<Rigidbody> ();
+            ballRigidBody.velocity = Vector3.zero;
+            ballRigidBody.angularVelocity = Vector3.zero;
         }
     }
 }
