@@ -36,11 +36,12 @@ public class ControllerInputManager : MonoBehaviour
         {
             if (device.GetPress (SteamVR_Controller.ButtonMask.Touchpad))
             {
+                // TODO: Maybe adjust the length of the laser as well?
                 laser.gameObject.SetActive (true);
                 TeleportObject.gameObject.SetActive (true);
 
                 laser.SetPosition (0, this.gameObject.transform.position);
-                if (Physics.Raycast (transform.position, transform.forward, out hit, laserLength, laserMask))
+                if (Physics.Raycast (transform.position, transform.forward, out hit, laserLength))
                 {
                     teleportLocation = hit.point;
                     laser.SetPosition (1, teleportLocation);
