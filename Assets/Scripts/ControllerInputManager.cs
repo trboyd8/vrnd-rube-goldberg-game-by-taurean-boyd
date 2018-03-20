@@ -1,93 +1,102 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 
 public class ControllerInputManager : MonoBehaviour
 {
     private SteamVR_TrackedObject trackedObject;
     private SteamVR_Controller.Device device;
-    private LineRenderer laser;
-    private RaycastHit hit;
-    private RaycastHit groundRay;
-    private Vector3 teleportLocation;
-    private int laserLength;
-    private int groundRayLength;
-    private float throwForce;
+    private float swipeSum;
+    private float touchLast;
+    private float touchCurrent;
+    private float distance;
+    private bool hasSwipedLeft;
+    private bool hasSwipedRight;
 
-    public GameObject TeleportObject;
-    public GameObject Player;
-    public LayerMask laserMask;
-    public bool IsLeftController;
+    public bool isLeftHand;
+    public ObjectMenuManager objectMenuManager;
+    public PlayerMovementManager playerMovementManager;
 
-	// Use this for initialization
-	void Start ()
+    // Use this for initialization
+    void Start()
     {
-        trackedObject = this.GetComponent<SteamVR_TrackedObject> ();
-        laser = this.GetComponentInChildren<LineRenderer> ();
-        laserLength = 8;
-        groundRayLength = 17;
-        throwForce = 1.5f;
-	}
-	
-	// Update is called once per frame
-	void Update ()
-    {
-        device = SteamVR_Controller.Input ((int)trackedObject.index);
+        trackedObject = this.GetComponent<SteamVR_TrackedObject>();
+    }
 
-        if (IsLeftController) // If its our left controller, we want to setup logic for handling teleportation
+    // Update is called once per frame
+    void Update()
+    {
+        device = SteamVR_Controller.Input((int)trackedObject.index);
+
+        if (device.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
         {
-            if (device.GetPress (SteamVR_Controller.ButtonMask.Touchpad))
+            if (!isLeftHand)
             {
-                // TODO: Maybe adjust the length of the laser as well?
-                laser.gameObject.SetActive (true);
-                TeleportObject.gameObject.SetActive (true);
+                objectMenuManager.EnableMenu();
+                touchLast = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x;
 
-                laser.SetPosition (0, this.gameObject.transform.position);
-                if (Physics.Raycast (transform.position, transform.forward, out hit, laserLength))
-                {
-                    teleportLocation = hit.point;
-                    laser.SetPosition (1, teleportLocation);
-                    TeleportObject.transform.position = new Vector3 (teleportLocation.x, teleportLocation.y, teleportLocation.z);
-                }
-                else
-                {
-                    teleportLocation = new Vector3 (transform.forward.x * laserLength + transform.position.x, transform.forward.y * laserLength + transform.position.y, transform.forward.z * laserLength + transform.position.z);
-                    if (Physics.Raycast (teleportLocation, -Vector3.up, out groundRay, groundRayLength, laserMask))
-                    {
-                        teleportLocation = new Vector3 (transform.forward.x * laserLength + transform.position.x, groundRay.point.y, transform.forward.z * laserLength + transform.position.z);
-                    }
-
-                    laser.SetPosition (1, transform.forward * laserLength + transform.position);
-                    TeleportObject.transform.position = teleportLocation;
-                }
-            }
-
-            if (device.GetPressUp (SteamVR_Controller.ButtonMask.Touchpad))
-            {
-                laser.gameObject.SetActive (false);
-                TeleportObject.gameObject.SetActive (false);
-                Player.transform.position = teleportLocation;
             }
         }
-	}
 
-    void OnTriggerStay(Collider other)
-    {
-        if (other.gameObject.CompareTag ("Throwable"))
+        if (device.GetPress(SteamVR_Controller.ButtonMask.Touchpad))
         {
-            if (device.GetPressDown (SteamVR_Controller.ButtonMask.Trigger))
+            if (isLeftHand)
             {
-                other.transform.SetParent (gameObject.transform);
-                other.GetComponent<Rigidbody> ().isKinematic = true;
-                device.TriggerHapticPulse (2000);
+               playerMovementManager.DisplayTeleportMarker();
             }
-            else if (device.GetPressUp (SteamVR_Controller.ButtonMask.Trigger))
+            else
             {
-                other.transform.SetParent (null);
-                Rigidbody otherRigidBody = other.GetComponent<Rigidbody> ();
-                otherRigidBody.isKinematic = false;
-                otherRigidBody.velocity = device.velocity * throwForce;
-                otherRigidBody.angularVelocity = device.angularVelocity;
+                // TODO: This resets when I move the figure back to the middle
+                touchCurrent = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x;
+                distance = touchCurrent - touchLast;
+                touchLast = touchCurrent;
+                swipeSum += distance;
+
+                if (!hasSwipedRight)
+                {
+                    if (swipeSum > 0.5f)
+                    {
+                        swipeSum = 0;
+                        objectMenuManager.MenuRight();
+                        hasSwipedRight = true;
+                        hasSwipedLeft = false;
+                    }
+                }
+
+                if (!hasSwipedLeft)
+                {
+                    if (swipeSum < -0.5f)
+                    {
+                        swipeSum = 0;
+                        objectMenuManager.MenuLeft();
+                        hasSwipedLeft = true;
+                        hasSwipedRight = false;
+                    }
+                }
+            }
+        }
+
+        if (device.GetPressUp(SteamVR_Controller.ButtonMask.Touchpad))
+        {
+            if (isLeftHand)
+            {
+                playerMovementManager.ClearTeleportMarker();
+            }
+            else
+            {
+                objectMenuManager.DisableMenu();
+                swipeSum = 0;
+                touchCurrent = 0;
+                touchLast = 0;
+                hasSwipedLeft = false;
+                hasSwipedRight = false;
+            }
+        }
+
+        if (device.GetPressDown(SteamVR_Controller.ButtonMask.Trigger))
+        {
+            if (!isLeftHand && objectMenuManager.IsMenuEnabled())
+            {
+                objectMenuManager.SpawnCurrentObject();
             }
         }
     }
