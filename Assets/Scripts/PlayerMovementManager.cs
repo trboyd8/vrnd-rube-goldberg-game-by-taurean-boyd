@@ -30,7 +30,7 @@ public class PlayerMovementManager : MonoBehaviour
         TeleportObject.gameObject.SetActive(true);
 
         laser.SetPosition(0, this.gameObject.transform.position);
-        if (Physics.Raycast(transform.position, transform.forward, out hit, laserLength))
+        if (Physics.Raycast(transform.position, transform.forward, out hit, laserLength, laserMask))
         {
             teleportLocation = hit.point;
             laser.SetPosition(1, teleportLocation);
@@ -38,13 +38,14 @@ public class PlayerMovementManager : MonoBehaviour
         }
         else
         {
-            teleportLocation = new Vector3(transform.forward.x * laserLength + transform.position.x, transform.forward.y * laserLength + transform.position.y, transform.forward.z * laserLength + transform.position.z);
+            teleportLocation = new Vector3(transform.forward.x * laserLength + transform.position.x, 0, transform.forward.z * laserLength + transform.position.z);
             if (Physics.Raycast(teleportLocation, -Vector3.up, out groundRay, groundRayLength, laserMask))
             {
                 teleportLocation = new Vector3(transform.forward.x * laserLength + transform.position.x, groundRay.point.y, transform.forward.z * laserLength + transform.position.z);
             }
 
-            laser.SetPosition(1, transform.forward * laserLength + transform.position);
+            Vector3 newPosition = transform.forward * laserLength + transform.position;
+            laser.SetPosition(1, new Vector3(newPosition.x, 0, newPosition.z));
             TeleportObject.transform.position = teleportLocation;
         }
     }

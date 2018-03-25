@@ -11,6 +11,7 @@ public class ControllerInputManager : MonoBehaviour
     private float distance;
     private bool hasSwipedLeft;
     private bool hasSwipedRight;
+    private float throwForce = 1.5f;
 
     public bool isLeftHand;
     public ObjectMenuManager objectMenuManager;
@@ -27,23 +28,18 @@ public class ControllerInputManager : MonoBehaviour
     {
         device = SteamVR_Controller.Input((int)trackedObject.index);
 
-        if (device.GetPressDown(SteamVR_Controller.ButtonMask.Touchpad))
+        if (device.GetTouchDown(SteamVR_Controller.ButtonMask.Touchpad))
         {
             if (!isLeftHand)
             {
                 objectMenuManager.EnableMenu();
                 touchLast = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x;
-
             }
         }
 
-        if (device.GetPress(SteamVR_Controller.ButtonMask.Touchpad))
+        if (device.GetTouch(SteamVR_Controller.ButtonMask.Touchpad))
         {
-            if (isLeftHand)
-            {
-               playerMovementManager.DisplayTeleportMarker();
-            }
-            else
+            if (!isLeftHand)
             {
                 // TODO: This resets when I move the figure back to the middle
                 touchCurrent = device.GetAxis(Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad).x;
@@ -52,7 +48,7 @@ public class ControllerInputManager : MonoBehaviour
                 swipeSum += distance;
 
                 if (!hasSwipedRight)
-                {
+                { 
                     if (swipeSum > 0.5f)
                     {
                         swipeSum = 0;
@@ -75,13 +71,9 @@ public class ControllerInputManager : MonoBehaviour
             }
         }
 
-        if (device.GetPressUp(SteamVR_Controller.ButtonMask.Touchpad))
+        if (device.GetTouchUp(SteamVR_Controller.ButtonMask.Touchpad))
         {
-            if (isLeftHand)
-            {
-                playerMovementManager.ClearTeleportMarker();
-            }
-            else
+            if (!isLeftHand)
             {
                 objectMenuManager.DisableMenu();
                 swipeSum = 0;
@@ -92,6 +84,22 @@ public class ControllerInputManager : MonoBehaviour
             }
         }
 
+        if (device.GetPress(SteamVR_Controller.ButtonMask.Touchpad))
+        {
+            if (isLeftHand)
+            {
+                playerMovementManager.DisplayTeleportMarker();
+            }
+        }
+
+        if (device.GetPressUp(SteamVR_Controller.ButtonMask.Touchpad))
+        {
+            if (isLeftHand)
+            {
+                playerMovementManager.ClearTeleportMarker();
+            }
+        }
+
         if (device.GetPressDown(SteamVR_Controller.ButtonMask.Trigger))
         {
             if (!isLeftHand && objectMenuManager.IsMenuEnabled())
@@ -99,5 +107,55 @@ public class ControllerInputManager : MonoBehaviour
                 objectMenuManager.SpawnCurrentObject();
             }
         }
+    }
+
+    void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.CompareTag("Throwable"))
+        {
+            if (device.GetPressUp(SteamVR_Controller.ButtonMask.Trigger))
+            {
+                ThrowObject(other);
+            }
+            else if (device.GetPressDown(SteamVR_Controller.ButtonMask.Trigger))
+            {
+                GrabObject(other);
+            }
+        }
+
+        if (other.gameObject.CompareTag("Structure"))
+        {
+            if (device.GetPressUp(SteamVR_Controller.ButtonMask.Trigger))
+            {
+                LeaveObject(other);
+            }
+            else if (device.GetPressDown(SteamVR_Controller.ButtonMask.Trigger))
+            {
+                GrabObject(other);
+            }
+        }
+    }
+
+    private void ThrowObject(Collider otherObject)
+    {
+        otherObject.transform.SetParent(null);
+        Rigidbody rigidBody = otherObject.GetComponent<Rigidbody>();
+        rigidBody.isKinematic = false;
+        rigidBody.velocity = device.velocity * throwForce;
+        rigidBody.angularVelocity = device.angularVelocity;
+    }
+
+    private void GrabObject(Collider otherObject)
+    {
+        otherObject.transform.SetParent(gameObject.transform);
+        otherObject.GetComponent<Rigidbody>().isKinematic = true;
+        device.TriggerHapticPulse(2000);
+    }
+
+    private void LeaveObject(Collider otherObject)
+    {
+        otherObject.transform.SetParent(null);
+        Rigidbody rigidBody = otherObject.GetComponent<Rigidbody>();
+        rigidBody.isKinematic = true;
     }
 }
