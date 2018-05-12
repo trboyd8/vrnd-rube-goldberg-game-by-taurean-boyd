@@ -21,8 +21,6 @@ public class BallReset : MonoBehaviour
     // react on collisions
     void OnCollisionEnter (Collision col)
     {
-        Debug.Log(col.gameObject.tag);
-
         if (col.gameObject.CompareTag ("Ground"))
         {
             this.gameObject.transform.position = originalPosition;
@@ -30,7 +28,11 @@ public class BallReset : MonoBehaviour
             ballRigidBody.velocity = Vector3.zero;
             ballRigidBody.angularVelocity = Vector3.zero;
         }
-        
+    }
+
+    // disable collectables on collision
+    private void OnTriggerEnter(Collider col)
+    {
         if (col.gameObject.CompareTag("Collectable"))
         {
             col.gameObject.SetActive(false);
