@@ -19,7 +19,7 @@ public class BallReset : MonoBehaviour
     // react on collisions
     void OnCollisionEnter (Collision col)
     {
-        if (col.gameObject.CompareTag ("Ground"))
+        if (col.gameObject.CompareTag ("Environment"))
         {
             this.gameObject.transform.position = originalPosition;
             Rigidbody ballRigidBody = this.GetComponent<Rigidbody> ();

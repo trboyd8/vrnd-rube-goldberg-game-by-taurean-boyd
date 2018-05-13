@@ -87,22 +87,6 @@ public class ControllerInputManager : MonoBehaviour
             }
         }
 
-        if (device.GetPress(SteamVR_Controller.ButtonMask.Touchpad))
-        {
-            if (isLeftHand)
-            {
-                playerMovementManager.DisplayTeleportMarker();
-            }
-        }
-
-        if (device.GetPressUp(SteamVR_Controller.ButtonMask.Touchpad))
-        {
-            if (isLeftHand)
-            {
-                playerMovementManager.ClearTeleportMarker();
-            }
-        }
-
         if (device.GetPressDown(SteamVR_Controller.ButtonMask.Trigger))
         {
             if (introMenu!= null && introMenu.activeSelf)
@@ -118,6 +102,27 @@ public class ControllerInputManager : MonoBehaviour
             if (!isLeftHand && objectMenuManager.IsMenuEnabled())
             {
                 objectMenuManager.SpawnCurrentObject();
+            }
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        device = SteamVR_Controller.Input((int)trackedObject.index);
+
+        if (device.GetPress(SteamVR_Controller.ButtonMask.Touchpad))
+        {
+            if (isLeftHand)
+            {
+                playerMovementManager.DisplayTeleportMarker();
+            }
+        }
+
+        if (device.GetPressUp(SteamVR_Controller.ButtonMask.Touchpad))
+        {
+            if (isLeftHand)
+            {
+                playerMovementManager.ClearTeleportMarker();
             }
         }
     }

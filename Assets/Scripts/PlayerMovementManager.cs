@@ -6,53 +6,59 @@ public class PlayerMovementManager : MonoBehaviour
 {
     private LineRenderer laser;
     private RaycastHit hit;
-    private RaycastHit groundRay;
+    private RaycastHit groundHit;
     private Vector3 teleportLocation;
     private int laserLength;
     private int groundRayLength;
 
     public GameObject TeleportObject;
     public GameObject Player;
-    public LayerMask laserMask;
 
 	// Use this for initialization
 	void Start ()
     {
-        laser = this.GetComponentInChildren<LineRenderer> ();
-        laserLength = 8;
-        groundRayLength = 17;
+        laser = this.GetComponent<LineRenderer>();
+        laserLength = 3;
+        groundRayLength = 2;
 	}
 	
     public void DisplayTeleportMarker()
     {
-        // TODO: Maybe adjust the length of the laser as well? By moving the touchpad up or down?
-        laser.gameObject.SetActive(true);
-        TeleportObject.gameObject.SetActive(true);
+        // Display the laser
+        laser.enabled = true;
+        laser.SetPosition(0, transform.position);
+        laser.SetPosition(1, transform.position + transform.forward * laserLength);
+        teleportLocation = Player.transform.position;
 
-        laser.SetPosition(0, this.gameObject.transform.position);
-        if (Physics.Raycast(transform.position, transform.forward, out hit, laserLength, laserMask))
+        // Test if we teleport to something
+        if (Physics.Raycast(transform.position, transform.forward, out hit, laserLength))
         {
+            laser.SetPosition(1, hit.point);
+            TeleportObject.transform.position = hit.point;
+            TeleportObject.gameObject.SetActive(true);
             teleportLocation = hit.point;
-            laser.SetPosition(1, teleportLocation);
-            TeleportObject.transform.position = new Vector3(teleportLocation.x, teleportLocation.y, teleportLocation.z);
         }
         else
         {
-            teleportLocation = new Vector3(transform.forward.x * laserLength + transform.position.x, 0, transform.forward.z * laserLength + transform.position.z);
-            if (Physics.Raycast(teleportLocation, -Vector3.up, out groundRay, groundRayLength, laserMask))
+            // Do a second test if we can hit something below where we are pointing
+            Vector3 potentialEndpoint = transform.position + transform.forward * laserLength;
+            if (Physics.Raycast(potentialEndpoint, Vector3.down, out groundHit, groundRayLength))
             {
-                teleportLocation = new Vector3(transform.forward.x * laserLength + transform.position.x, groundRay.point.y, transform.forward.z * laserLength + transform.position.z);
+                laser.SetPosition(1, groundHit.point);
+                TeleportObject.transform.position = groundHit.point;
+                TeleportObject.gameObject.SetActive(true);
+                teleportLocation = groundHit.point;
             }
-
-            Vector3 newPosition = transform.forward * laserLength + transform.position;
-            laser.SetPosition(1, new Vector3(newPosition.x, 0, newPosition.z));
-            TeleportObject.transform.position = teleportLocation;
+            else
+            {
+                TeleportObject.gameObject.SetActive(false);
+            }
         }
     }
 
     public void ClearTeleportMarker()
     {
-        laser.gameObject.SetActive(false);
+        laser.enabled = false;
         TeleportObject.gameObject.SetActive(false);
         Player.transform.position = teleportLocation;
     }
