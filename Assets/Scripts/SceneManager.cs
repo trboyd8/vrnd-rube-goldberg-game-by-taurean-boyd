@@ -1,12 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SceneManager : MonoBehaviour {
 
     public CollectableManager collectableManager;
     public GameObject completeUI;
     private bool isLevelComplete;
+    public string nextLevelName;
 
     public void ResetLevel()
     {
@@ -26,6 +25,6 @@ public class SceneManager : MonoBehaviour {
 
     public void LoadNextLevel()
     {
-        Debug.Log("Loading the next level.");
+        SteamVR_LoadLevel.Begin(nextLevelName);
     }
 }
