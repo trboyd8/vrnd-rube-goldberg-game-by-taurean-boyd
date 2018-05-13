@@ -13,12 +13,6 @@ public class BallReset : MonoBehaviour
     {
         originalPosition = this.gameObject.transform.position;
 	}
-	
-	// Update is called once per frame
-	void Update ()
-    {
-        
-	}
 
     // react on collisions
     void OnCollisionEnter (Collision col)

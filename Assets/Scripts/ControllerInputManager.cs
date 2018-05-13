@@ -16,6 +16,7 @@ public class ControllerInputManager : MonoBehaviour
     public bool isLeftHand;
     public ObjectMenuManager objectMenuManager;
     public PlayerMovementManager playerMovementManager;
+    public GameObject platform;
 
     // Use this for initialization
     void Start()
@@ -115,6 +116,13 @@ public class ControllerInputManager : MonoBehaviour
         {
             if (device.GetPressUp(SteamVR_Controller.ButtonMask.Trigger))
             {
+                // Check if the position of the 'other' object is outside of the platform bounds
+                if (!IsWithinBounds(other.transform.position))
+                {
+                    // Change ball color'
+                    Debug.Log("Ball was thrown outside of platform zone.");
+                }
+                
                 ThrowObject(other);
             }
             else if (device.GetPressDown(SteamVR_Controller.ButtonMask.Trigger))
@@ -157,5 +165,15 @@ public class ControllerInputManager : MonoBehaviour
         otherObject.transform.SetParent(null);
         Rigidbody rigidBody = otherObject.GetComponent<Rigidbody>();
         rigidBody.isKinematic = true;
+    }
+
+    private bool IsWithinBounds(Vector3 position)
+    {
+        Collider platformCollider = platform.GetComponent<Collider>();
+        if (platformCollider.bounds.min.x <= position.x && platformCollider.bounds.max.x >= position.x)
+            if (platformCollider.bounds.min.z <= position.z && platformCollider.bounds.max.z >= position.z)
+                return true;
+
+        return false;
     }
 }
