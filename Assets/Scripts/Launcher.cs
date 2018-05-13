@@ -8,7 +8,6 @@ public class Launcher : MonoBehaviour {
 
     void OnTriggerEnter(Collider other)
     {
-        Debug.Log(other.gameObject.tag);
         if (other.gameObject.CompareTag("Throwable"))
         {
             Rigidbody rigidbody = other.gameObject.GetComponent<Rigidbody>();

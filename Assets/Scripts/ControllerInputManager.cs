@@ -110,10 +110,10 @@ public class ControllerInputManager : MonoBehaviour
                 introMenu.SetActive(false);
             }
 
-            //if (sceneManager.IsLevelComplete())
-            //{
+            if (sceneManager.IsLevelComplete())
+            {
                 sceneManager.LoadNextLevel();
-            //}
+            }
 
             if (!isLeftHand && objectMenuManager.IsMenuEnabled())
             {
