@@ -6,6 +6,8 @@ public class BallReset : MonoBehaviour
 {
     private Vector3 originalPosition;
 
+    public SceneManager sceneManager;
+
 	// Use this for initialization
 	void Start ()
     {
@@ -27,6 +29,8 @@ public class BallReset : MonoBehaviour
             Rigidbody ballRigidBody = this.GetComponent<Rigidbody> ();
             ballRigidBody.velocity = Vector3.zero;
             ballRigidBody.angularVelocity = Vector3.zero;
+
+            sceneManager.ResetLevel();
         }
     }
 
@@ -36,7 +40,6 @@ public class BallReset : MonoBehaviour
         if (col.gameObject.CompareTag("Collectable"))
         {
             col.gameObject.SetActive(false);
-            // Need to notify something that the collectable is collected.
         }
     }
 }

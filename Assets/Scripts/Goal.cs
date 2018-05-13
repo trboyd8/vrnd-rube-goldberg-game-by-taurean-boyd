@@ -1,33 +1,22 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Goal : MonoBehaviour {
 
-    public GameObject collectables;
+    public CollectableManager collectableManager;
     public SceneManager sceneManager;
 
     private void OnTriggerEnter(Collider col)
     {
         if (col.gameObject.CompareTag("Throwable"))
         {
-            bool foundActiveCollectable = false;
-            foreach (Transform child in collectables.transform)
-            {
-                if (child.gameObject.activeSelf)
-                {
-                    foundActiveCollectable = true;
-                    break;
-                }
-            }
-
-            if (foundActiveCollectable)
+            if (collectableManager.AnyActiveCollectables())
             {
                 sceneManager.ResetLevel();
             }
             else
             {
-                sceneManager.LoadNextLevel();
+                col.gameObject.SetActive(false);
+                sceneManager.LevelComplete();
             }
         }
     }
