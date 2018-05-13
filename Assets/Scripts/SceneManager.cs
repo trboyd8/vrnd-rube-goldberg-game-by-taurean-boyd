@@ -5,6 +5,8 @@ using UnityEngine;
 public class SceneManager : MonoBehaviour {
 
     public CollectableManager collectableManager;
+    public GameObject completeUI;
+    private bool isLevelComplete;
 
     public void ResetLevel()
     {
@@ -13,8 +15,13 @@ public class SceneManager : MonoBehaviour {
 
     public void LevelComplete()
     {
-        Debug.Log("Level complete.");
-        // TODO: Add code to display a level complete menu. User clicks a button to continue.
+        this.isLevelComplete = true;
+        completeUI.SetActive(true);
+    }
+
+    public bool IsLevelComplete()
+    {
+        return this.isLevelComplete;
     }
 
     public void LoadNextLevel()

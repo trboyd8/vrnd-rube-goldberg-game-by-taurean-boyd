@@ -17,6 +17,8 @@ public class ControllerInputManager : MonoBehaviour
     public ObjectMenuManager objectMenuManager;
     public PlayerMovementManager playerMovementManager;
     public GameObject platform;
+    public GameObject introMenu;
+    public SceneManager sceneManager;
 
     // Use this for initialization
     void Start()
@@ -103,6 +105,16 @@ public class ControllerInputManager : MonoBehaviour
 
         if (device.GetPressDown(SteamVR_Controller.ButtonMask.Trigger))
         {
+            if (introMenu.activeSelf)
+            {
+                introMenu.SetActive(false);
+            }
+
+            if (sceneManager.IsLevelComplete())
+            {
+                sceneManager.LoadNextLevel();
+            }
+
             if (!isLeftHand && objectMenuManager.IsMenuEnabled())
             {
                 objectMenuManager.SpawnCurrentObject();
