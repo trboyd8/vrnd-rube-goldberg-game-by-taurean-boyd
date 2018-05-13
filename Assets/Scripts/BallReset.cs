@@ -5,6 +5,7 @@ using UnityEngine;
 public class BallReset : MonoBehaviour
 {
     private Vector3 originalPosition;
+    private Color originalColor;
 
     public SceneManager sceneManager;
 
@@ -12,6 +13,7 @@ public class BallReset : MonoBehaviour
 	void Start ()
     {
         originalPosition = this.gameObject.transform.position;
+        originalColor = this.gameObject.GetComponent<Renderer>().material.color;
 	}
 
     // react on collisions
@@ -25,7 +27,13 @@ public class BallReset : MonoBehaviour
             ballRigidBody.angularVelocity = Vector3.zero;
 
             sceneManager.ResetLevel();
+            this.gameObject.GetComponent<Renderer>().material.color = originalColor;
         }
+    }
+
+    public void ColorBall()
+    {
+        this.gameObject.GetComponent<Renderer>().material.color = Color.red;
     }
 
     // disable collectables on collision

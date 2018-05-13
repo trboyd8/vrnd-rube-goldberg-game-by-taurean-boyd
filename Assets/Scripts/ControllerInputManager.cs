@@ -119,8 +119,7 @@ public class ControllerInputManager : MonoBehaviour
                 // Check if the position of the 'other' object is outside of the platform bounds
                 if (!IsWithinBounds(other.transform.position))
                 {
-                    // Change ball color'
-                    Debug.Log("Ball was thrown outside of platform zone.");
+                    other.gameObject.GetComponent<BallReset>().ColorBall();
                 }
                 
                 ThrowObject(other);
