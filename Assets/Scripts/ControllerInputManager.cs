@@ -105,7 +105,7 @@ public class ControllerInputManager : MonoBehaviour
 
         if (device.GetPressDown(SteamVR_Controller.ButtonMask.Trigger))
         {
-            if (introMenu.activeSelf)
+            if (introMenu!= null && introMenu.activeSelf)
             {
                 introMenu.SetActive(false);
             }
