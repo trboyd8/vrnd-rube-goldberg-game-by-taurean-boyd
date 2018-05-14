@@ -10,6 +10,7 @@ public class SceneManager : MonoBehaviour {
     public void ResetLevel()
     {
         collectableManager.EnableAllCollectables();
+        Goal.CanCompleteLevel = true;
     }
 
     public void LevelComplete()

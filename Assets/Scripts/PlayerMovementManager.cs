@@ -13,6 +13,7 @@ public class PlayerMovementManager : MonoBehaviour
 
     public GameObject TeleportObject;
     public GameObject Player;
+    public LayerMask activeLayers;
 
 	// Use this for initialization
 	void Start ()
@@ -34,7 +35,7 @@ public class PlayerMovementManager : MonoBehaviour
         teleportLocation = Player.transform.position;
 
         // Test if we teleport to something
-        if (Physics.Raycast(transform.position, transform.forward, out hit, laserLength))
+        if (Physics.Raycast(transform.position, transform.forward, out hit, laserLength, activeLayers))
         {
             laser.SetPosition(1, hit.point);
             TeleportObject.transform.position = hit.point;
@@ -44,18 +45,12 @@ public class PlayerMovementManager : MonoBehaviour
         {
             // Do a second test if we can hit something below where we are pointing
             Vector3 potentialEndpoint = transform.position + transform.forward * laserLength;
-            if (Physics.Raycast(potentialEndpoint, Vector3.down, out groundHit, groundRayLength))
+            if (Physics.Raycast(potentialEndpoint, Vector3.down, out groundHit, groundRayLength, activeLayers))
             {
                 laser.SetPosition(1, groundHit.point);
                 TeleportObject.transform.position = groundHit.point;
                 teleportLocation = groundHit.point;
             }
-        }
-
-        // Clamp height
-        if (teleportLocation.y >= 3)
-        {
-            teleportLocation = Player.transform.position;
         }
     }
 

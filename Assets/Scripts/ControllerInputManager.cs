@@ -137,6 +137,7 @@ public class ControllerInputManager : MonoBehaviour
                 if (!IsWithinBounds(other.transform.position))
                 {
                     other.gameObject.GetComponent<BallReset>().ColorBall();
+                    Goal.CanCompleteLevel = false;
                 }
                 
                 ThrowObject(other);
