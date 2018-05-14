@@ -26,8 +26,11 @@ public class PlayerMovementManager : MonoBehaviour
     {
         // Display the laser
         laser.enabled = true;
+        TeleportObject.gameObject.SetActive(true);
+
         laser.SetPosition(0, transform.position);
         laser.SetPosition(1, transform.position + transform.forward * laserLength);
+        TeleportObject.transform.position = transform.position + transform.forward * laserLength;
         teleportLocation = Player.transform.position;
 
         // Test if we teleport to something
@@ -35,7 +38,6 @@ public class PlayerMovementManager : MonoBehaviour
         {
             laser.SetPosition(1, hit.point);
             TeleportObject.transform.position = hit.point;
-            TeleportObject.gameObject.SetActive(true);
             teleportLocation = hit.point;
         }
         else
@@ -46,13 +48,14 @@ public class PlayerMovementManager : MonoBehaviour
             {
                 laser.SetPosition(1, groundHit.point);
                 TeleportObject.transform.position = groundHit.point;
-                TeleportObject.gameObject.SetActive(true);
                 teleportLocation = groundHit.point;
             }
-            else
-            {
-                TeleportObject.gameObject.SetActive(false);
-            }
+        }
+
+        // Clamp height
+        if (teleportLocation.y >= 3)
+        {
+            teleportLocation = Player.transform.position;
         }
     }
 

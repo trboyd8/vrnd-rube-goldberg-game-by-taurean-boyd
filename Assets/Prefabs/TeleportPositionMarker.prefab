@@ -20,7 +20,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4060157148974918}
   - component: {fileID: 33378281161486666}
-  - component: {fileID: 136896661100712420}
   - component: {fileID: 23589284212624362}
   m_Layer: 2
   m_Name: TeleportPositionMarker
@@ -83,16 +82,3 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1135304012482726}
   m_Mesh: {fileID: 10206, guid: 0000000000000000e000000000000000, type: 0}
---- !u!136 &136896661100712420
-CapsuleCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1135304012482726}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
